@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="script.js"></script>
+        <script src="bower_components/angular/angular.js"></script>
+        <link rel="stylesheet" href="styles.css" type="text/css" />
+    </head>
+    <script>
+    
+    /*global angular*/
+    
+    var aanwezigheidslijstModule = angular.module('AanwezigheidslijstModule', []);
+    aanwezigheidslijstModule.service('StudentModelService', function($q) {
+        var deferred = $q.defer();
+        
+        
+        var studenten = [
+        {naam: 'Jos Peeters', kotstudent: false, aanwezigheid: false},
+        {naam: 'Marieke Flint', kotstudent: false, aanwezigheid: false},
+        {naam: 'Brad Limpi', kotstudent: false, aanwezigheid: true},
+    ];
+    
+    deferred.resolve(studenten);
+    
+    this.getStudenten = function() {
+        return deferred.promise;
+    }
+    
+    
+    });
+        
+        aanwezigheidslijstModule.controller('AanwezigheidsCtrl', function($scope, StudentModelService) {
+           $scope.paginaTitel = 'Aanwezigheidslijst';
+           
+           StudentModelService.getStudenten().then(function(studenten) {
+               $scope.studenten = studenten;
+           });
+        });
+        
+        aanwezigheidslijstModule.directive('student', function() {
+           return {
+               scope: {
+                   object: '=', //waarde
+                   view:'@' //string
+               },
+               templateUrl: function($elem, $attr) {
+                  return 'objects/student/student.html';
+               },
+               
+               controller: function($scope) {
+                   $scope.student = $scope.object;
+               }
+           };
+        });
+        
+    </script>
+    <body ng-app="AanwezigheidslijstModule" ng-controller="AanwezigheidsCtrl">
+        <h1>{{paginaTitel}}</h1>
+        <student ng-repeat="student in studenten" object="student" view="detial" ng-class="{nietaanwezig: !student.aanwezigheid}"> </student>
+    </body>
+</html>
